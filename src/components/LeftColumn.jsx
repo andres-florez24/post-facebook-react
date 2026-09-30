@@ -2,7 +2,8 @@ import React from 'react';
 import { useUser } from './UserContext'; // Traemos el hook
 
 export default function LeftColumn() {
-  const miUsuario = useUser(); // Extraemos tus datos
+  // En vez de: const miUsuario = useUser();
+const { usuarioActual: miUsuario } = useUser();
 
   return (
     <div className="w3-col m3">
