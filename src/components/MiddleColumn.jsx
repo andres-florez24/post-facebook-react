@@ -3,7 +3,7 @@ import Post from './Post';
 import { useUser } from './UserContext';
 
 export default function MiddleColumn() {
-  const miUsuario = useUser();
+  const { usuarioActual } = useUser(); // Extraemos directamente al usuario actual
 
   // 1. Estado para los posts (iniciamos con los 3 de la plantilla original)
   const [posts, setPosts] = useState([
@@ -44,29 +44,26 @@ export default function MiddleColumn() {
   const handleSeleccionarImagen = (e) => {
     const archivo = e.target.files[0];
     if (archivo) {
-      // Creamos una URL temporal para mostrar la imagen en el navegador
       setNuevaImagen(URL.createObjectURL(archivo));
     }
   };
 
   // Función para agregar el post a la lista
   const manejarPublicacion = () => {
-    if (!nuevoTexto.trim() && !nuevaImagen) return; // No publicar si está vacío
+    if (!nuevoTexto.trim() && !nuevaImagen) return;
 
     const nuevoPost = {
-      id: crypto.randomUUID(), // El 4.5 de la rúbrica
-      avatar: miUsuario.foto,
+      id: crypto.randomUUID(),
+      avatar: usuarioActual.foto, // Usamos la foto del usuario logueado
       time: "Justo ahora",
-      name: miUsuario.nombre,
+      name: usuarioActual.nombre, // Usamos el nombre real
       text: nuevoTexto,
-      image1: nuevaImagen, // Asignamos la imagen que subiste
+      image1: nuevaImagen, 
       image2: null
     };
 
-    // Agregamos el post arriba de la lista
     setPosts([nuevoPost, ...posts]);
     
-    // Limpiamos los campos
     setNuevoTexto('');
     setNuevaImagen(null);
   };
@@ -74,14 +71,12 @@ export default function MiddleColumn() {
   return (
     <div className="w3-col m7">
       
-      {/* Caja para crear un nuevo post */}
       <div className="w3-row-padding">
         <div className="w3-col m12">
           <div className="w3-card w3-round w3-white">
             <div className="w3-container w3-padding">
-              <h6 className="w3-opacity">¿Qué estás pensando?</h6>
+              <h6 className="w3-opacity">¿Qué estás pensando, {usuarioActual.nombre.split(' ')[0]}?</h6>
               
-              {/* Input de texto real */}
               <input 
                 type="text"
                 className="w3-input w3-border w3-margin-bottom"
@@ -90,10 +85,7 @@ export default function MiddleColumn() {
                 onChange={(e) => setNuevoTexto(e.target.value)}
               />
               
-             {/* Input para subir foto y botón publicar */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                
-                {/* 1. Ocultamos el input real con display: 'none' y le damos un ID */}
                 <input 
                   id="input-foto"
                   type="file" 
@@ -102,7 +94,6 @@ export default function MiddleColumn() {
                   style={{ display: 'none' }} 
                 />
                 
-                {/* 2. Creamos un label que actúe como botón (apunta al ID del input) */}
                 <label htmlFor="input-foto" className="w3-button w3-theme-d1 w3-round">
                   <i className="fa fa-image"></i> {nuevaImagen ? 'Cambiar foto' : 'Subir foto'}
                 </label>
@@ -112,7 +103,6 @@ export default function MiddleColumn() {
                 </button> 
               </div>
 
-              {/* Vista previa pequeña de la imagen si se seleccionó una */}
               {nuevaImagen && (
                 <div className="w3-margin-top">
                   <span className="w3-opacity w3-small">Vista previa:</span><br/>
@@ -124,7 +114,6 @@ export default function MiddleColumn() {
         </div>
       </div>
       
-      {/* Recorremos el estado de posts y renderizamos el componente Post */}
       {posts.map((post) => (
         <Post 
           key={post.id}
@@ -134,6 +123,7 @@ export default function MiddleColumn() {
           text={post.text}
           image1={post.image1}
           image2={post.image2}
+          usuarioLogueado={usuarioActual} // Le enviamos el usuario actual al archivo Post.jsx
         />
       ))}
       

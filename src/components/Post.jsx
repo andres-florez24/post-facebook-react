@@ -4,8 +4,8 @@ import { useUser } from './UserContext';
 
 export default function Post({ avatar, time, name, text, image1, image2 }) {
   // --- CONTEXTO ---
-  // Traemos tu nombre desde el contexto (Requisito 3.5: useContext)
-  const miUsuario = useUser(); 
+  // Extraemos directamente usuarioActual del contexto (Requisito 3.5: useContext)
+  const { usuarioActual } = useUser(); 
 
   // --- ESTADOS (Requisito 3.5: useState) ---
   const [likes, setLikes] = useState(0);
@@ -39,7 +39,7 @@ export default function Post({ avatar, time, name, text, image1, image2 }) {
 
     const nuevoComentario = {
       id: crypto.randomUUID(), // Requisito 4.5: Solución al error del ID
-      autor: miUsuario.nombre, // Usamos tu nombre automático del UserContext
+      autor: usuarioActual.nombre, // ¡CORREGIDO! Usamos tu nombre real del contexto
       texto: textoComentario,
       respuestas: [] 
     };
@@ -57,7 +57,7 @@ export default function Post({ avatar, time, name, text, image1, image2 }) {
             ...comentario.respuestas, 
             { 
               id: crypto.randomUUID(), // Requisito 4.5
-              autor: miUsuario.nombre, // Nombre automático
+              autor: usuarioActual.nombre, // ¡CORREGIDO! También para las respuestas
               texto: textoDeRespuesta 
             }
           ]
@@ -89,7 +89,7 @@ export default function Post({ avatar, time, name, text, image1, image2 }) {
 
       {/* Botones de Acción */}
       <button type="button" className={`w3-button w3-margin-bottom ${isLiked ? 'w3-theme-d4' : 'w3-theme-d1'}`} onClick={handleLike}>
-        <i className="fa fa-thumbs-up"></i> {isLiked ? `Ya no me gusta (${likes})` : `Me gusta (${likes})`}
+        <i className="fa fa-thumbs-up"></i> {isLiked ? 'Ya no me gusta' : 'Me gusta'} {likes > 0 ? `(${likes})` : ''}
       </button> 
       
       <button type="button" className="w3-button w3-theme-l4 w3-margin-bottom w3-right" onClick={handleShare}>
@@ -109,6 +109,7 @@ export default function Post({ avatar, time, name, text, image1, image2 }) {
             placeholder="Escribe un comentario..." 
             value={textoComentario}
             onChange={(e) => setTextoComentario(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && agregarComentario()} 
           />
           <button className="w3-button w3-theme-d1 w3-round" onClick={agregarComentario}>Comentar</button>
         </div>

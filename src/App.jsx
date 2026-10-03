@@ -44,7 +44,7 @@ export default function App() {
             <Routes>
               {/* --- Rutas Públicas (Libres para acceder) --- */}
               <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              <Route path="/registro" element={<Register />} />
 
               {/* --- Rutas Restringidas (Nota 5.0) --- */}
               <Route path="/" element={

@@ -3,13 +3,52 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  // 1. "Base de datos" de cuentas guardadas en localStorage
   const [usuariosRegistrados, setUsuariosRegistrados] = useState(() => {
     const guardados = localStorage.getItem('db_usuarios');
-    return guardados ? JSON.parse(guardados) : [];
+    if (guardados) {
+      return JSON.parse(guardados);
+    } else {
+      return [
+        {
+          nombre: "Andrés Esteban",
+          correo: "admin@redsocial.com",
+          password: "admin",
+          fechaNacimiento: "1994-05-24",
+          genero: "Hombre",
+          foto: "https://www.w3schools.com/w3images/avatar3.png",
+          ubicacion: "Medellín, Colombia",
+          profesion: "Desarrollador Frontend",
+          preguntaSeguridad: "¿En qué ciudad se conocieron tus padres?",
+          respuestaSeguridad: "medellin" 
+        },
+        {
+          nombre: "Ana María Gómez",
+          correo: "ana@test.com",
+          password: "123",
+          fechaNacimiento: "1996-08-15",
+          genero: "Mujer",
+          foto: "https://www.w3schools.com/w3images/avatar6.png",
+          ubicacion: "Bogotá, Colombia",
+          profesion: "Diseñadora UX",
+          preguntaSeguridad: "¿Cuál fue el nombre de tu primer jefe?",
+          respuestaSeguridad: "carlos"
+        },
+        {
+          nombre: "Carlos Ruiz",
+          correo: "carlos@test.com",
+          password: "abc",
+          fechaNacimiento: "1990-11-02",
+          genero: "Hombre",
+          foto: "https://www.w3schools.com/w3images/avatar2.png",
+          ubicacion: "Cali, Colombia",
+          profesion: "Ingeniero de Datos",
+          preguntaSeguridad: "¿Cuál era el nombre de tu profesor favorito en la escuela primaria?",
+          respuestaSeguridad: "marta"
+        }
+      ];
+    }
   });
 
-  // 2. Estado de la sesión actual
   const [autenticado, setAutenticado] = useState(() => {
     return localStorage.getItem('sesion_iniciada') === 'true';
   });
@@ -25,7 +64,6 @@ export const UserProvider = ({ children }) => {
     };
   });
 
-  // 3. Guardar cambios en la memoria del navegador automáticamente
   useEffect(() => {
     localStorage.setItem('db_usuarios', JSON.stringify(usuariosRegistrados));
   }, [usuariosRegistrados]);
@@ -35,15 +73,13 @@ export const UserProvider = ({ children }) => {
     localStorage.setItem('usuario_activo', JSON.stringify(usuarioActual));
   }, [autenticado, usuarioActual]);
 
-  // --- FUNCIÓN DE REGISTRO REAL ---
   const registrarUsuario = (nuevoUsuario) => {
-    // Verificamos si el correo ya existe para no duplicar cuentas
     const correoExiste = usuariosRegistrados.find(user => user.correo === nuevoUsuario.correo);
     if (correoExiste) return false;
 
     const usuarioCompleto = {
       ...nuevoUsuario,
-      foto: "https://www.w3schools.com/w3images/avatar3.png",
+      foto: nuevoUsuario.foto ? nuevoUsuario.foto : "https://www.w3schools.com/w3images/avatar3.png",
       profesion: "Nuevo Estudiante",
       ubicacion: "Medellín, Colombia",
       cumpleanos: nuevoUsuario.fechaNacimiento
@@ -55,9 +91,7 @@ export const UserProvider = ({ children }) => {
     return true;
   };
 
-  // --- FUNCIÓN DE LOGIN REAL (Adiós al error fatal) ---
   const login = (correoIngresado, passwordIngresado) => {
-    // Buscamos a alguien que coincida EXACTAMENTE en correo y contraseña
     const usuarioValido = usuariosRegistrados.find(
       user => user.correo === correoIngresado && user.password === passwordIngresado
     );
@@ -65,9 +99,9 @@ export const UserProvider = ({ children }) => {
     if (usuarioValido) {
       setUsuarioActual(usuarioValido);
       setAutenticado(true);
-      return true; // Credenciales correctas
+      return true;
     } else {
-      return false; // Credenciales incorrectas
+      return false; 
     }
   };
 
@@ -75,8 +109,21 @@ export const UserProvider = ({ children }) => {
     setAutenticado(false);
   };
 
+  const obtenerPreguntaSeguridad = (correoBuscado) => {
+    const usuarioEncontrado = usuariosRegistrados.find(user => user.correo === correoBuscado);
+    return usuarioEncontrado ? usuarioEncontrado.preguntaSeguridad : null;
+  };
+
+  const recuperarPassword = (correoBuscado, respuestaIngresada) => {
+    const usuarioEncontrado = usuariosRegistrados.find(user => user.correo === correoBuscado);
+    if (usuarioEncontrado && usuarioEncontrado.respuestaSeguridad.toLowerCase() === respuestaIngresada.toLowerCase().trim()) {
+      return usuarioEncontrado.password;
+    }
+    return null; 
+  };
+
   return (
-    <UserContext.Provider value={{ usuarioActual, autenticado, login, logout, registrarUsuario }}>
+    <UserContext.Provider value={{ usuarioActual, autenticado, login, logout, registrarUsuario, obtenerPreguntaSeguridad, recuperarPassword }}>
       {children}
     </UserContext.Provider>
   );
