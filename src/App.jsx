@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 
 // Contextos
 import { UserProvider } from './components/UserContext';
@@ -37,7 +37,7 @@ export default function App() {
   return (
     <UserProvider>
       <GlobalProvider>
-        <BrowserRouter>
+        <HashRouter>
           <div className="w3-theme-l5" style={{ minHeight: '100vh' }}>
             <Navbar />
 
@@ -78,7 +78,7 @@ export default function App() {
               } />
             </Routes>
           </div>
-        </BrowserRouter>
+        </HashRouter>
       </GlobalProvider>
     </UserProvider>
   );
